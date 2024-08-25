@@ -1,10 +1,10 @@
 import express,{Application} from 'express'
-import Controllers from '../controllers/controller'
+import AuthControllers from '../controllers/authController'
 
 
 const route:Application=express()
-const controller=new Controllers
+const authController=new AuthControllers()
 
-route.get('/register',controller.register)
+route.get('/register',authController.register)
 
 export default route
