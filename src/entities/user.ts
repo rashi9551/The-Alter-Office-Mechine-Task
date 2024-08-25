@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+// Define the User interface, extending Document
 export interface UserInterface extends Document {
     userName: string;
     email: string;
@@ -7,6 +8,7 @@ export interface UserInterface extends Document {
     profilePhoto?: string;
 }
 
+// Define the User schema
 const UserSchema: Schema<UserInterface> = new Schema({
     userName: {
         type: String,
@@ -33,6 +35,7 @@ const UserSchema: Schema<UserInterface> = new Schema({
     timestamps: true
 });
 
+// Create the User model with the UserInterface
 const UserModel = mongoose.model<UserInterface>("User", UserSchema);
 
 export default UserModel;

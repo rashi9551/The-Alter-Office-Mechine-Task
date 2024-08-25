@@ -6,12 +6,12 @@ dotenv.config()
 
 const connectDB=async():Promise<void>=>{
     try {
-        const MONGO_URLURL=process.env.MONGO_URL || 'mongodb://mongo:27017/Real-Time-Chat'
+        const MONGO_URLURL=process.env.MONGO_URL || 'mongodb://mongo:27017'
         if(!MONGO_URLURL)
             {
                 throw new Error("MONGO_URL is not defined in environment variables.")
             }
-            await mongoose.connect(`${MONGO_URLURL}/Go-user`)
+            await mongoose.connect(`${MONGO_URLURL}/Real-Time-Chat`)
             console.log("database Connected");
     } catch (error) {
         console.error('Error connecting to MongoDB:', error) 

@@ -1,6 +1,7 @@
-import { UserInterface } from "./interface";
+import { UserData, UserInterface } from "./interface";
 
 export interface IUserRepo {
-  findUser(emai:String ): Promise<UserInterface | null>;
+  findUser(emai:String ): Promise<UserData | null>;
+  saveUser(data:UserInterface): Promise<UserData | null> ;
 
   }
