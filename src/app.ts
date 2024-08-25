@@ -8,6 +8,7 @@ import compression from 'compression'
 import helmet from "helmet";
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
+import { setUpSocketIO } from "./services/socket";
 
 class App{
     public app:Application;
@@ -19,6 +20,7 @@ class App{
         this.applyMiddleware()
         this.routes()
         connectDB()
+        setUpSocketIO(this.server)
     }
     
     private applyMiddleware(): void {
