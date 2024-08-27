@@ -1,7 +1,7 @@
 import {Response,Request} from 'express'
 import { StatusCode } from '../../Interfaces/enum'
 import AuthUseCases from '../use-cases/authUseCases';
-import { loginResponse, StatusMessage } from '../../Interfaces/interface';
+import { LoginResponse, StatusMessage } from '../../Interfaces/interface';
 
 
 const authUseCases=new AuthUseCases()
@@ -30,7 +30,7 @@ export default class AuthControllers{
     login=async(req:Request,res:Response)=>{
         try {
             const {email,password}=req.body
-            const loginResponse:loginResponse | StatusMessage= await authUseCases.login(email,password) as loginResponse |StatusMessage
+            const loginResponse:LoginResponse | StatusMessage= await authUseCases.login(email,password) as LoginResponse |StatusMessage
             if ('status' in loginResponse) {
                 res.status(loginResponse.status).json(loginResponse);
             } else {

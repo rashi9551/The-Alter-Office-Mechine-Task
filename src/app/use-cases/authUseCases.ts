@@ -1,5 +1,5 @@
 import { StatusCode } from "../../Interfaces/enum";
-import { loginResponse, StatusMessage, UserData, UserInterface } from "../../Interfaces/interface";
+import { LoginResponse, StatusMessage, UserData, UserInterface } from "../../Interfaces/interface";
 import { IUseCaseInterface } from "../../Interfaces/IUseCaseInterface";
 import { createToken } from "../../services/jwt";
 import { comparePassword } from "../../utils/passwordHashing";
@@ -58,7 +58,7 @@ export default class AuthUseCases implements IUseCaseInterface{
         }
     }
     
-    login = async (email:string,password:string): Promise<loginResponse | StatusMessage | null> => {
+    login = async (email:string,password:string): Promise<LoginResponse | StatusMessage | null> => {
         try {
             const existingUser = await userRepo.findUser(email) as UserData
             if(existingUser){
