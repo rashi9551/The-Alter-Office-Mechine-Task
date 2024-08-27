@@ -1,11 +1,11 @@
 import mongoose,{ Types ,Document} from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { Socket } from 'socket.io';
 
 export interface UserInterface{
     userName: string;
     email: string;
     password: string;
-    profilePhoto?: string;
     otp:string
 }
 export interface UserData{
@@ -47,7 +47,7 @@ export interface RetreiveChatData{
 export interface IChat extends Document {
     _id: mongoose.Types.ObjectId;
     type: 'personal' | 'group';  // Type of chat
-    participants: string[];  // List of participants for personal or group chat
+    members: string[];  // List of members for personal or group chat
     groupName?: string;  // Optional group name for group chats
     groupAdmin?: string;  // Optional admin for group chats
     stat?: boolean;  // Optional stat property
@@ -65,17 +65,17 @@ export interface IMessage extends Document {
 }
 
 export interface GroupData  {
-    participants: string[];  // List of participants for personal or group chat
+    members: string[];  // List of members for personal or group chat
     groupName: string;  // Optional group name for group chats
     groupAdmin: string; 
 }
 export interface AddParticipantData  {
     groupId: mongoose.Types.ObjectId,
-    participantsToAdd: string[]
+    membersToAdd: string[]
 }
 export interface RemoveParticipantData  {
     groupId: mongoose.Types.ObjectId,
-    participantsToRemove: string[]
+    membersToRemove: string[]
 }
 
 interface ILastMessage {
@@ -89,7 +89,7 @@ interface ILastMessage {
 interface IChatResponse {
     _id: mongoose.Types.ObjectId;
     type: 'personal' | 'group';  // Type of chat: personal or group
-    participants: string[];  // List of participants
+    members: string[];  // List of members
     groupName?: string;  // Optional group name for group chats
     groupAdmin?: string;  // Optional admin for group chats
     createdAt: Date;
@@ -98,7 +98,11 @@ interface IChatResponse {
 }
 
 export interface DecodedToken {
-    id: string;
+    userId: string;
+}
+
+export interface AuthenticatedSocket extends Socket {
+    decoded?: DecodedToken;
 }
 
 

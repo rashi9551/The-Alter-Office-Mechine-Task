@@ -17,7 +17,7 @@ export default class MessageControllers {
     }
     addParticipantToGroup = async (req: Request, res: Response): Promise<Response>  => {
         try {
-            const addParticipantToGroupResponse: StatusMessage = await messageUseCases.addParticipantsToGroup(req.body) as StatusMessage;
+            const addParticipantToGroupResponse: StatusMessage = await messageUseCases.addmembersToGroup(req.body) as StatusMessage;
             return res.status(addParticipantToGroupResponse?.status).json(addParticipantToGroupResponse);
         } catch (error) {
             console.log(error);

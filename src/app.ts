@@ -9,6 +9,7 @@ import helmet from "helmet";
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 import { setUpSocketIO } from "./services/socket";
+import { limiter } from './utils/rateLimitter'
 
 class App{
     public app:Application;
@@ -32,11 +33,16 @@ class App{
         this.app.use(helmet());
         this.app.use(logger("dev"));
         this.app.use(cookieParser());
-        // this.app.use(limiter)
+        this.app.use(limiter)
     }
 
     private routes():void{
         this.app.use('/api',route)
+        // Error-handling middleware
+        this.app.use(( req, res, next) => {
+            res.status(500).send('Something broke!');
+        });
+        
         
     }
 

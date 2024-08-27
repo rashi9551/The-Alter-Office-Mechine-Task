@@ -1,13 +1,14 @@
 import { AddParticipantData, chatLists, IMessage, RemoveParticipantData, RetreiveChatData, StatusMessage } from "../../Interfaces/interface";
-import { messageRespository } from "../repository/messageRepository";
+import messageRespository from "../repository/messageRepository";
 import { GroupData } from "../../Interfaces/interface";
 import { chatRepositiory } from "../repository/chatRepository";
 import { StatusCode } from "../../Interfaces/enum";
 import mongoose from "mongoose";
+import { IMessageUseCase } from "../../Interfaces/IMessageUseCase";
 
 const chatRepo=new chatRepositiory()
-
-export default class MessageUseCase {
+const MessageRepo= new messageRespository()
+export default class MessageUseCase implements IMessageUseCase {
     getChatList= async (user: string):Promise<chatLists | null> => {
         try {
             let response = await chatRepo.getChatList(user)
@@ -28,7 +29,7 @@ export default class MessageUseCase {
     }
     sendMessage= async (chatId:string,senderId: string,recieverId:string,content:string): Promise<IMessage | null>  => {
         try {
-            let response = await messageRespository.sendMessage(chatId,senderId,recieverId,content)
+            let response = await MessageRepo.sendMessage(chatId,senderId,recieverId,content)
             return response
         } catch (err) {
             console.log("Error while creating chats", err);
@@ -38,7 +39,7 @@ export default class MessageUseCase {
 
     getMessages= async (chatId: string): Promise<IMessage[] | null>  => {
         try {
-            let response = await messageRespository.getMessage(chatId)
+            let response = await MessageRepo.getMessage(chatId)
             return response
         } catch (err) {
             console.error("Error while getting message", err)
@@ -63,19 +64,18 @@ export default class MessageUseCase {
             else return { status: StatusCode.InternalServerError as number, message: "Failed to Group Created Successfull" };
         } catch (err) {
             console.error("Error while getting message", err)
-            return null
-        }
+            return { status: StatusCode.InternalServerError as number, message: "Failed to Group Created Successfull" };        }
     }
-    addParticipantsToGroup = async (addParticipantData:AddParticipantData): Promise<StatusMessage | null> => {
+    addmembersToGroup = async (addParticipantData:AddParticipantData): Promise<StatusMessage | null> => {
         try {
-            const response = await chatRepo.addParticipantsToGroupChat(addParticipantData)
-            if(response)return ({status:StatusCode.Created as number,message:"Add participants to group  Successfully "})
+            const response = await chatRepo.addmembersToGroupChat(addParticipantData)
+            if(response)return ({status:StatusCode.Created as number,message:"Add members to group  Successfully "})
 
-            else return { status: StatusCode.InternalServerError as number, message: "Failed to Add participants to group" };
+            else return { status: StatusCode.InternalServerError as number, message: "Failed to Add members to group" };
 
         } catch (err) {
-            console.error(`Error adding participants: ${err}`);
-            return null;
+            console.error(`Error adding members: ${err}`);
+            return { status: StatusCode.InternalServerError as number, message: "Failed to Add members to group" };
         }
     };
     removeFromGroupResponse = async (RemoveParticipantData: RemoveParticipantData): Promise<StatusMessage | null> => {
@@ -85,19 +85,21 @@ export default class MessageUseCase {
             if (response) {
                 return {
                     status: StatusCode.OK as number,
-                    message: "Participants removed from group successfully"
+                    message: "members removed from group successfully"
                 };
             } else {
                 return {
                     status: StatusCode.InternalServerError as number,
-                    message: "Failed to remove participants from group"
+                    message: "Failed to remove members from group"
                 };
             }
     
         } catch (err) {
-            console.error(`Error removing participants: ${err}`);
-            return null;
-        }
+            console.error(`Error removing members: ${err}`);
+            return {
+                status: StatusCode.InternalServerError as number,
+                message: "Failed to remove members from group"
+            };        }
     };
     
 } 

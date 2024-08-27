@@ -11,7 +11,6 @@ export const otpSetData=async(data:UserInterface,otp:string)=>{
         userName: data.userName,
         email: data.email,
         password: data.password,
-        profilePhoto: data.profilePhoto || '', 
         otp: otp
     };
 
@@ -33,7 +32,6 @@ export const getUserData= async(email: string): Promise<UserInterface | null> =>
             userName: userData.userName,
             email: userData.email,
             password: userData.password,
-            profilePhoto: userData.profilePhoto || '',
             otp: userData.otp || ''
         };
         return user;

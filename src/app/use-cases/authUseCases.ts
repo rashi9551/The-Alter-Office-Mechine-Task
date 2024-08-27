@@ -3,7 +3,7 @@ import { LoginResponse, StatusMessage, UserData, UserInterface } from "../../Int
 import { IUseCaseInterface } from "../../Interfaces/IUseCaseInterface";
 import JwtControllers  from "../../services/jwt";
 import { comparePassword } from "../../utils/passwordHashing";
-import { getUserData, otpSetData } from "../../utils/redis";
+import { getUserData, otpSetData } from "../../services/redis";
 import { sendOtp } from "../../utils/sendEmail";
 import UserRepository from "../repository/userRepository";
 
@@ -13,7 +13,7 @@ const jwtController=new JwtControllers()
 
 export default class AuthUseCases implements IUseCaseInterface{
     
-    register = async (data: UserInterface): Promise<StatusMessage | null> => {
+    register = async (data: UserInterface): Promise<StatusMessage > => {
         try {
             const existingUser = await userRepo.findUser(data.email);
 
@@ -35,7 +35,7 @@ export default class AuthUseCases implements IUseCaseInterface{
             return { status: StatusCode.InternalServerError as number, message: "Internal Server Error" };
         }
     }
-    verifyOtp = async (email:string,otp:string): Promise<StatusMessage | null> => {
+    verifyOtp = async (email:string,otp:string): Promise<StatusMessage> => {
         try {
             const userData = await getUserData(email);
             
@@ -59,14 +59,14 @@ export default class AuthUseCases implements IUseCaseInterface{
         }
     }
     
-    login = async (email:string,password:string): Promise<LoginResponse | StatusMessage | null> => {
+    login = async (email:string,password:string): Promise<LoginResponse | StatusMessage > => {
         try {
             const existingUser = await userRepo.findUser(email) as UserData
             if(existingUser){
                 const isPasswordMatch=await comparePassword(password,existingUser.password)
                 if(isPasswordMatch){
-                    const accessToken = await jwtController.createToken(existingUser._id.toString(), '15m');
-                    const refreshToken = await jwtController.createToken(existingUser._id.toString(), '7d');
+                    const accessToken = await jwtController.createToken(existingUser._id.toString(),'15m', process.env.JWT_SECRET_KEY||"Rashid",);
+                    const refreshToken = await jwtController.createToken(existingUser._id.toString(), '7d',process.env.JWT_REFRESH_SECRET_KEY||"rashi123");
                     return {
                         status: StatusCode.OK as number,
                         message: "Login successful",

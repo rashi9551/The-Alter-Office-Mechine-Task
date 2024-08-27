@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 import ChatModel from "../../entities/chat";
 import { AddParticipantData, chatLists, GroupData, IChat, RemoveParticipantData, RetreiveChatData, StatusMessage } from "../../Interfaces/interface";
 import { StatusCode } from "../../Interfaces/enum";
+import { IChatRepository } from "../../Interfaces/IChatRepository";
 
-export class chatRepositiory {
+export class chatRepositiory implements IChatRepository {
     
     createChat = async (
         user1: string,
@@ -13,7 +14,7 @@ export class chatRepositiory {
             // Check if the chat already exists
             const existingChat = await ChatModel.findOne({
                 type: 'personal',
-                participants: { $all: [user1, user2] },
+                members: { $all: [user1, user2] },
             }).exec();
 
             if (existingChat) {
@@ -24,7 +25,7 @@ export class chatRepositiory {
             // Create a new chat
             const newChat = new ChatModel({
                 type: 'personal',
-                participants: [user1, user2],
+                members: [user1, user2],
             });
 
             await newChat.save();
@@ -41,7 +42,7 @@ export class chatRepositiory {
         GroupData: GroupData
     ): Promise<IChat | null> => {
         try {
-            const { participants, groupName, groupAdmin } = GroupData;
+            const { members, groupName, groupAdmin } = GroupData;
 
             const existingChat = await ChatModel.findOne({
                 type: 'group',
@@ -55,7 +56,7 @@ export class chatRepositiory {
 
             const newChat = new ChatModel({
                 type: 'group',
-                participants: participants, 
+                members: members, 
                 groupName: groupName,
                 groupAdmin: groupAdmin,
             });
@@ -71,36 +72,44 @@ export class chatRepositiory {
         }
     };
 
-    addParticipantsToGroupChat = async (addParticipantData:AddParticipantData): Promise<IChat | null> => {
-        const{groupId,participantsToAdd}=addParticipantData
-        const chat: IChat | null = await ChatModel.findById(groupId);
-        if (!chat) {
-            console.error('Group chat not found');
-            return null;
+    addmembersToGroupChat = async (addParticipantData:AddParticipantData): Promise<IChat | null> => {
+        try {
+            const{groupId,membersToAdd}=addParticipantData
+            const chat: IChat | null = await ChatModel.findById(groupId);
+            if (!chat) {
+                console.error('Group chat not found');
+                return null;
+            }
+            console.log(membersToAdd);
+            
+            const newmembers = membersToAdd.filter(participant => !chat.members.includes(participant));
+            chat.members.push(...newmembers);
+            await chat.save();
+            console.log('members added:', newmembers);
+            return chat;
+            
+        } catch (error) {
+            console.log(error);
+            return null
         }
-        const newParticipants = participantsToAdd.filter(participant => !chat.participants.includes(participant));
-        chat.participants.push(...newParticipants);
-        await chat.save();
-        console.log('Participants added:', newParticipants);
-        return chat;
     };
 
     removeFromGroup = async (RemoveParticipantData:RemoveParticipantData): Promise<IChat | null> => {
         try {
-            const { groupId, participantsToRemove } = RemoveParticipantData;            
+            const { groupId, membersToRemove } = RemoveParticipantData;            
             const chat: IChat | null = await ChatModel.findById(groupId);
             if (!chat) {
                 console.error('Group chat not found');
                 return null;
             }
 
-            chat.participants = chat.participants.filter(participant => !participantsToRemove.includes(participant));
+            chat.members = chat.members.filter(members => !membersToRemove.includes(members));
             await chat.save();
-            console.log('Participants removed:', participantsToRemove);
+            console.log('members removed:', membersToRemove);
             return chat;
 
         } catch (err) {
-            console.error(`Error removing participants from group: ${err}`);
+            console.error(`Error removing members from group: ${err}`);
             return null;
         }
     };
@@ -110,7 +119,7 @@ export class chatRepositiory {
     try {
         const chatlist = await ChatModel.aggregate([
             {
-                $match: { participants: userId } 
+                $match: { members: userId } 
             },
             {
                 $lookup: {
@@ -132,7 +141,7 @@ export class chatRepositiory {
             {
                 $group: {
                     _id: "$_id",  
-                    participants: { $first: "$participants" }, 
+                    members: { $first: "$members" }, 
                     createdAt: { $first: "$createdAt" },  
                     updatedAt: { $first: "$updatedAt" }, 
                     lastMessage: { $first: "$messages" }, 

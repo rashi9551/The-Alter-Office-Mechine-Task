@@ -2,11 +2,12 @@ import mongoose from "mongoose";
 import ChatModel from "../../entities/chat";
 import MessageModel from "../../entities/messages";
 import { IMessage } from "../../Interfaces/interface";
+import { IMessageRepo } from "../../Interfaces/IMessageRepository";
 
 
-export const messageRespository = {
+export default class messageRespository implements IMessageRepo {
     
-    getMessage: async (chatId: string): Promise<IMessage[] | null> => {
+    getMessage = async (chatId: string): Promise<IMessage[] | null> => {
         try {
             const chats: IMessage[] = await MessageModel.find({ chatId }).exec() as IMessage[]
             return chats
@@ -15,8 +16,8 @@ export const messageRespository = {
             console.error("Error while getting chats", err);
             return null;
         }
-    },
-    sendMessage : async (
+    }
+    sendMessage =async (
         chatId: string,
         senderId: string,
         receiverId: string | null,
