@@ -1,7 +1,7 @@
 import { StatusCode } from "../../Interfaces/enum";
 import { LoginResponse, StatusMessage, UserData, UserInterface } from "../../Interfaces/interface";
 import { IUseCaseInterface } from "../../Interfaces/IUseCaseInterface";
-import { createToken } from "../../services/jwt";
+import JwtControllers  from "../../services/jwt";
 import { comparePassword } from "../../utils/passwordHashing";
 import { getUserData, otpSetData } from "../../utils/redis";
 import { sendOtp } from "../../utils/sendEmail";
@@ -9,6 +9,7 @@ import UserRepository from "../repository/userRepository";
 
 
 const userRepo=new UserRepository()
+const jwtController=new JwtControllers()
 
 export default class AuthUseCases implements IUseCaseInterface{
     
@@ -64,8 +65,8 @@ export default class AuthUseCases implements IUseCaseInterface{
             if(existingUser){
                 const isPasswordMatch=await comparePassword(password,existingUser.password)
                 if(isPasswordMatch){
-                    const accessToken = await createToken(existingUser._id.toString(), '15m');
-                    const refreshToken = await createToken(existingUser._id.toString(), '7d');
+                    const accessToken = await jwtController.createToken(existingUser._id.toString(), '15m');
+                    const refreshToken = await jwtController.createToken(existingUser._id.toString(), '7d');
                     return {
                         status: StatusCode.OK as number,
                         message: "Login successful",

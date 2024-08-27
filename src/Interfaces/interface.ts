@@ -97,4 +97,8 @@ interface IChatResponse {
     lastMessage?: ILastMessage;  // Optional last message object
 }
 
+export interface DecodedToken {
+    id: string;
+}
+
 
