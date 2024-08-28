@@ -38,6 +38,7 @@ export default class AuthUseCases implements IUseCaseInterface{
     verifyOtp = async (email:string,otp:string): Promise<StatusMessage> => {
         try {
             const userData = await getUserData(email);
+            console.log(userData,"ithu user");
             
             if (userData) {
                 if (otp === userData.otp) {
@@ -45,7 +46,7 @@ export default class AuthUseCases implements IUseCaseInterface{
                     if (saveUser) {
                         return { status: StatusCode.Created as number, message: "User created successfully" };
                     } else {
-                        return { status: StatusCode.InternalServerError as number, message: "Failed to save user" };
+                        return {status: StatusCode.InternalServerError as number, message: "Failed to save user" };
                     }
                 } else {
                     return { status: StatusCode.BadRequest as number, message: "OTP does not match" };
